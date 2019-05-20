@@ -1,29 +1,40 @@
 {{/* vim: set filetype=mustache: */}}
-
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "nats.name" -}}
+{{- define "pytorch.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
 */}}
-{{- define "nats.fullname" -}}
+{{- define "pytorch.fullname" -}}
+{{- if .Values.fullnameOverride -}}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
 {{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+{{- end -}}
+{{- end -}}
 
-{{- define "nats.chart" -}}
+{{/*
+Create chart name and version as used by the chart label.
+*/}}
+{{- define "pytorch.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
-Return the proper Nats image name
+Return the proper PyTorch image name
 */}}
-{{- define "nats.image" -}}
+{{- define "pytorch.image" -}}
 {{- $registryName := .Values.image.registry -}}
 {{- $repositoryName := .Values.image.repository -}}
 {{- $tag := .Values.image.tag | toString -}}
@@ -44,31 +55,12 @@ Also, we can't use a single if because lazy evaluation is not an option
 {{- end -}}
 
 {{/*
-Create a random alphanumeric password string.
-We prepend a random letter to the string to avoid password validation errors
+Return the proper git image name
 */}}
-{{- define "nats.randomPassword" -}}
-{{- randAlpha 1 -}}{{- randAlphaNum 9 -}}
-{{- end -}}
-
-{{/*
-Return the appropriate apiVersion for networkpolicy.
-*/}}
-{{- define "networkPolicy.apiVersion" -}}
-{{- if semverCompare ">=1.4-0, <1.7-0" .Capabilities.KubeVersion.GitVersion -}}
-{{- print "extensions/v1beta1" -}}
-{{- else -}}
-{{- print "networking.k8s.io/v1" -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Return the proper image name (for the metrics image)
-*/}}
-{{- define "nats.metrics.image" -}}
-{{- $registryName := .Values.metrics.image.registry -}}
-{{- $repositoryName := .Values.metrics.image.repository -}}
-{{- $tag := .Values.metrics.image.tag | toString -}}
+{{- define "git.image" -}}
+{{- $registryName := .Values.git.registry -}}
+{{- $repositoryName := .Values.git.repository -}}
+{{- $tag := .Values.git.tag | toString -}}
 {{/*
 Helm 2.11 supports the assignment of a value to a variable defined in a different scope,
 but Helm 2.9 and 2.10 doesn't support it, so we need to implement this if-else logic.
@@ -88,7 +80,7 @@ Also, we can't use a single if because lazy evaluation is not an option
 {{/*
 Return the proper Docker Image Registry Secret Names
 */}}
-{{- define "nats.imagePullSecrets" -}}
+{{- define "pytorch.imagePullSecrets" -}}
 {{/*
 Helm 2.11 supports the assignment of a value to a variable defined in a different scope,
 but Helm 2.9 and 2.10 does not support it, so we need to implement this if-else logic.
@@ -100,21 +92,21 @@ imagePullSecrets:
 {{- range .Values.global.imagePullSecrets }}
   - name: {{ . }}
 {{- end }}
-{{- else if or .Values.image.pullSecrets .Values.metrics.image.pullSecrets }}
+{{- else if or .Values.image.pullSecrets .Values.git.pullSecrets }}
 imagePullSecrets:
 {{- range .Values.image.pullSecrets }}
   - name: {{ . }}
 {{- end }}
-{{- range .Values.metrics.image.pullSecrets }}
+{{- range .Values.git.pullSecrets }}
   - name: {{ . }}
 {{- end }}
 {{- end -}}
-{{- else if or .Values.image.pullSecrets .Values.metrics.image.pullSecrets }}
+{{- else if or .Values.image.pullSecrets .Values.git.pullSecrets }}
 imagePullSecrets:
 {{- range .Values.image.pullSecrets }}
   - name: {{ . }}
 {{- end }}
-{{- range .Values.metrics.image.pullSecrets }}
+{{- range .Values.git.pullSecrets }}
   - name: {{ . }}
 {{- end }}
 {{- end -}}
@@ -123,9 +115,10 @@ imagePullSecrets:
 {{/*
 Compile all warnings into a single message, and call fail.
 */}}
-{{- define "nats.validateValues" -}}
+{{- define "pytorch.validateValues" -}}
 {{- $messages := list -}}
-{{- $messages := append $messages (include "nats.validateValues.resourceType" .) -}}
+{{- $messages := append $messages (include "pytorch.validateValues.mode" .) -}}
+{{- $messages := append $messages (include "pytorch.validateValues.worldSize" .) -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
 
@@ -134,11 +127,21 @@ Compile all warnings into a single message, and call fail.
 {{- end -}}
 {{- end -}}
 
-{{/* Validate values of NATS - must provide a valid resourceType ("deployment" or "statefulset") */}}
-{{- define "nats.validateValues.resourceType" -}}
-{{- if and (ne .Values.resourceType "deployment") (ne .Values.resourceType "statefulset") -}}
-nats: resourceType
-    Invalid resourceType selected. Valid values are "deployment" and
-    "statefulset". Please set a valid mode (--set resourceType="xxxx")
+{{/* Validate values of PyTorch - must provide a valid mode ("distributed" or "standalone") */}}
+{{- define "pytorch.validateValues.mode" -}}
+{{- if and (ne .Values.mode "distributed") (ne .Values.mode "standalone") -}}
+pytorch: mode
+    Invalid mode selected. Valid values are "distributed" and
+    "standalone". Please set a valid mode (--set mode="xxxx")
+{{- end -}}
+{{- end -}}
+
+{{/* Validate values of PyTorch - number of replicas must be even, greater than 4 and lower than 32 */}}
+{{- define "pytorch.validateValues.worldSize" -}}
+{{- $replicaCount := int .Values.worldSize }}
+{{- if and (eq .Values.mode "distributed") (lt $replicaCount 24) -}}
+pytorch: worldSize
+    World size must be greater than 1 in distributed mode!!
+    Please set a valid world size (--set worldSize=X)
 {{- end -}}
 {{- end -}}
