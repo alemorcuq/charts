@@ -158,7 +158,7 @@ mariadb:
 ##
 ## Elasticsearch chart configuration
 ##
-## https://github.com/helm/charts/blob/master/stable/elasticsearch/values.yaml
+## https://github.com/bitnami/charts/blob/master/bitnami/elasticsearch/values.yaml
 ##
 elasticsearch:
   ## Whether to deploy a elasticsearch server to use as magento's search engine
