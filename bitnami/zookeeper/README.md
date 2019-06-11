@@ -51,8 +51,8 @@ The following tables lists the configurable parameters of the Zookeeper chart an
 | `global.imagePullSecrets`             | Global Docker registry secret names as an array                     | `[]` (does not add image pull secrets to deployed pods)  |
 | `image.registry`                      | Zookeeper image registry                                            | `docker.io`                                              |
 | `image.repository`                    | Zookeeper Image name                                                | `bitnami/zookeeper`                                      |
-| `image.tag`                           | Zookeeper Image tag                                                 | `{VERSION}`                                              |
-| `image.pullPolicy`                    | Zookeeper image pull policy                                         | `Always`                                                 |
+| `image.tag`                           | Zookeeper Image tag                                                 | `{TAG_NAME}`                                             |
+| `image.pullPolicy`                    | Zookeeper image pull policy                                         | `IfNotPresent`                                           |
 | `image.pullSecrets`                   | Specify docker-registry secret names as an array                    | `[]` (does not add image pull secrets to deployed pods)  |
 | `image.debug`                         | Specify if debug values should be set                               | `false`                                                  |
 | `nameOverride`              | String to partially override zookeeper.fullname template with a string (will append the release name)                                           | `nil`                                                    |
@@ -71,9 +71,10 @@ The following tables lists the configurable parameters of the Zookeeper chart an
 | `auth.enabled`                        | Enable Zookeeper auth                                               | `false`                                                  |
 | `auth.clientUser`                     | User that will use Zookeeper clients to auth                        | `nil`                                                    |
 | `auth.clientPassword`                 | Password that will use Zookeeper clients to auth                    | `nil`                                                    |
-| `auth.serverUsers`                    | List of user to be created                                          | `[]`                                                     |
-| `auth.serverPasswords`                | List of passwords to assign to users when created                   | `[]`                                                     |
+| `auth.serverUsers`                    | List of user to be created                                          | `nil`                                                     |
+| `auth.serverPasswords`                | List of passwords to assign to users when created                   | `nil`                                                     |
 | `heapSize`                            | Size in MB for the Java Heap options (Xmx and XMs)                  | `[]`                                                     |
+| `logLevel`                            | Log level of Zookeeper server                                       | `ERROR`                                                  |
 | `jvmFlags`                            | Default JVMFLAGS for the ZooKeeper process                          | `nil`                                                    |
 | `config`                              | Configure ZooKeeper with a custom zoo.conf file                     | `nil`                                                    |
 | `service.type`                        | Kubernetes Service type                                             | `ClusterIP`                                              |
@@ -135,6 +136,36 @@ $ helm install --name my-release -f values.yaml bitnami/zookeeper
 
 > **Tip**: You can use the default [values.yaml](values.yaml)
 
+### Production configuration
+
+This chart includes a `values-production.yaml` file where you can find some parameters oriented to production configuration in comparison to the regular `values.yaml`.
+
+```console
+$ helm install --name my-release -f ./values-production.yaml bitnami/zookeeper
+```
+
+- Number of ZooKeeper nodes:
+```diff
+- replicaCount: 1
++ replicaCount: 3
+```
+
+- Start a side-car prometheus exporter:
+```diff
+- metrics.enabled: false
++ metrics.enabled: true
+```
+
+### [Rolling VS Immutable tags](https://docs.bitnami.com/containers/how-to/understand-rolling-tags-containers/)
+
+It is strongly recommended to use immutable tags in a production environment. This ensures your deployment does not change automatically if the same tag is updated with a different image.
+
+Bitnami will release a new chart updating its containers if a new version of the main container, significant changes, or critical vulnerabilities exist.
+
+### Log level
+
+You can configure the Zookeeper log level using the `ZOO_LOG_LEVEL` environment variable. By default, it is set to `ERROR` because of each readiness probe produce an `INFO` message on connection and a `WARN` message on disconnection.
+
 ## Persistence
 
 The [Bitnami Zookeeper](https://github.com/bitnami/bitnami-docker-zookeeper) image stores the Zookeeper data and configurations at the `/bitnami/zookeeper` path of the container.
@@ -143,6 +174,13 @@ Persistent Volume Claims are used to keep the data across deployments. This is k
 See the [Configuration](#configuration) section to configure the PVC or to disable persistence.
 
 ## Upgrading
+
+### To 3.0.0
+
+This new version of the chart includes the new Zookeeper major version 3.5.5. Note that to perform an automatic upgrade
+of the application, each node will need to have at least one snapshot file created in the data directory. If not, the
+new version of the application won't be able to start the service. Please refer to [ZOOKEEPER-3056](https://issues.apache.org/jira/browse/ZOOKEEPER-3056)
+in order to find ways to workaround this issue in case you are facing it.
 
 ### To 2.0.0
 

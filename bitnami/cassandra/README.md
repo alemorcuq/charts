@@ -52,8 +52,8 @@ The following tables lists the configurable parameters of the cassandra chart an
 | `global.imagePullSecrets`                  | Global Docker registry secret names as an array                                                                | `[]` (does not add image pull secrets to deployed pods) |
 | `image.registry`                           | Cassandra Image registry                                                                                           | `docker.io`                                          |
 | `image.repository`                         | Cassandra Image name                                                                                               | `bitnami/cassandra`                                      |
-| `image.tag`                                | Cassandra Image tag                                                                                                | `{VERSION}`                                          |
-| `image.pullPolicy`                         | Image pull policy                                                                                              | `Always`                                             |
+| `image.tag`                                | Cassandra Image tag                                                                                                | `{TAG_NAME}`                                         |
+| `image.pullPolicy`                         | Image pull policy                                                                                              | `IfNotPresent`                                       |
 | `image.pullSecrets`                        | Specify docker-registry secret names as an array                                                               | `[]` (does not add image pull secrets to deployed pods) |
 | `service.type`                       | Kubernetes Service type                                                                          | `ClusterIP`                                          |
 | `service.nodePort`                   | Kubernetes Service nodePort                                                                      | `nil`                                                |
@@ -136,6 +136,52 @@ $ helm install --name my-release -f values.yaml bitnami/cassandra
 ```
 
 > **Tip**: You can use the default [values.yaml](values.yaml)
+
+### Production configuration
+
+This chart includes a `values-production.yaml` file where you can find some parameters oriented to production configuration in comparison to the regular `values.yaml`.
+
+```console
+$ helm install --name my-release -f ./values-production.yaml bitnami/cassandra
+```
+
+- Number of Cassandra and seed nodes:
+```diff
+- master.replicaCount: 1
+- master.seedCount: 1
++ master.replicaCount: 3
++ master.seedCount: 2
+```
+
+- Minimum nuber of instances that must be available in the cluster:
+```diff
+- cluster.minimumAvailable: 1
++ cluster.minimumAvailable: 2
+```
+
+- Force the user to provide a non-empty password for `dbUser.user`:
+```diff
+- dbUser.forcePassword: false
++ dbUser.forcePassword: true
+```
+
+- Enable NetworkPolicy:
+```diff
+- networkPolicy.enabled: false
++ networkPolicy.enabled: true
+```
+
+- Start a side-car prometheus exporter:
+```diff
+- metrics.enabled: false
++ metrics.enabled: true
+```
+
+### [Rolling VS Immutable tags](https://docs.bitnami.com/containers/how-to/understand-rolling-tags-containers/)
+
+It is strongly recommended to use immutable tags in a production environment. This ensures your deployment does not change automatically if the same tag is updated with a different image.
+
+Bitnami will release a new chart updating its containers if a new version of the main container, significant changes, or critical vulnerabilities exist.
 
 ## Persistence
 

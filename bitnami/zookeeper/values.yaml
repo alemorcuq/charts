@@ -13,12 +13,12 @@
 image:
   registry: docker.io
   repository: bitnami/zookeeper
-  tag: 3.4.14
+  tag: 3.5.5-debian-9-r9
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
   ##
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   ## Optionally specify an array of imagePullSecrets.
   ## Secrets must be manually created in the namespace.
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -96,16 +96,20 @@ auth:
   ## Password that will use Zookeeper clients to auth
   ##
   # clientPassword:
-  ## Comma, semicolon or whitespace separated list of user to be created. Example: user1,user2,admin
+  ## Comma, semicolon or whitespace separated list of user to be created. Specify them as a string, for example: "user1,user2,admin"
   ##
-  # serverUsers: []
-  ## Comma, semicolon or whitespace separated list of passwords to assign to users when created. Example: pass4user1, pass4user2, pass4admin
+  # serverUsers: ""
+  ## Comma, semicolon or whitespace separated list of passwords to assign to users when created. Specify them as a string, for example: "pass4user1, pass4user2, pass4admin"
   ##
-  # serverPasswords: []
+  # serverPasswords: ""
 
 ## Size in MB for the Java Heap options (Xmx and XMs). This env var is ignored if Xmx an Xms are configured via JVMFLAGS
 ##
 heapSize: 1024
+
+## Log level for the Zookeeper server. ERROR by default. Have in mind if you set it to INFO or WARN the ReadinessProve will produce a lot of logs.
+##
+logLevel: ERROR
 
 ## Default JVMFLAGS for the ZooKeeper process
 ##

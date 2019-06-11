@@ -55,8 +55,8 @@ The following table lists the configurable parameters of the Elasticsearch chart
 | `global.imagePullSecrets`                         | Global Docker registry secret names as an array                                                                           | `[]` (does not add image pull secrets to deployed pods)                                          |
 | `image.registry`                                  | Elasticsearch image registry                                                                                              | `docker.io`                                             |
 | `image.repository`                                | Elasticsearch image repository                                                                                            | `bitnami/elasticsearch`                                 |
-| `image.tag`                                       | Elasticsearch image tag                                                                                                   | `{VERSION}`                                             |
-| `image.pullPolicy`                                | Image pull policy                                                                                                         | `Always`                                                |
+| `image.tag`                                       | Elasticsearch image tag                                                                                                   | `{TAG_NAME}`                                            |
+| `image.pullPolicy`                                | Image pull policy                                                                                                         | `IfNotPresent`                                          |
 | `image.pullSecrets`                               | Specify docker-registry secret names as an array                                                                          | `[]` (does not add image pull secrets to deployed pods)                                                   |
 | `name`                                            | Elasticsearch cluster name                                                                                                | `elastic`                                               |
 | `plugins`                                         | Comma, semi-colon or space separated list of plugins to install at initialization                                         | `nil`                                                   |
@@ -78,6 +78,7 @@ The following table lists the configurable parameters of the Elasticsearch chart
 | `master.livenessProbe.timeoutSeconds`             | When the probe times out (master-eligible nodes pod)                                                                      | `5`                                                     |
 | `master.livenessProbe.successThreshold`           | Minimum consecutive successes for the probe to be considered successful after having failed (master-eligible nodes pod)   | `1`                                                     |
 | `master.livenessProbe.failureThreshold`           | Minimum consecutive failures for the probe to be considered failed after having succeeded                                 | `5`                                                     |
+| `master.podAnnotations`                        | Annotations for master pods. | `{}` |
 | `master.readinessProbe.enabled`                   | Enable/disable the readiness probe (master-eligible nodes pod)                                                            | `true`                                                  |
 | `master.readinessProbe.initialDelaySeconds`       | Delay before readiness probe is initiated (master-eligible nodes pod)                                                     | `90`                                                    |
 | `master.readinessProbe.periodSeconds`             | How often to perform the probe (master-eligible nodes pod)                                                                | `10`                                                    |
@@ -93,6 +94,7 @@ The following table lists the configurable parameters of the Elasticsearch chart
 | `coordinating.heapSize`                           | Coordinating-only node heap size                                                                                          | `128m`                                                  |
 | `coordinating.antiAffinity`                       | Coordinating-only node pod anti-affinity policy                                                                           | `soft`                                                  |
 | `coordinating.nodeAffinity`                       | Coordinating-only node affinity policy                                                                           | `nil`                                                  |
+| `coordinating.podAnnotations`                     | Annotations for coordniating pods. | `{}` |
 | `coordinating.service.type`                       | Kubernetes Service type (coordinating-only nodes)                                                                         | `ClusterIP`                                             |
 | `coordinating.service.port`                       | Kubernetes Service port for REST API (coordinating-only nodes)                                                            | `9200`                                                  |
 | `coordinating.service.nodePort`                   | Kubernetes Service nodePort (coordinating-only nodes)                                                                     | `nil`                                                   |
@@ -112,7 +114,7 @@ The following table lists the configurable parameters of the Elasticsearch chart
 | `coordinating.readinessProbe.successThreshold`    | Minimum consecutive successes for the probe to be considered successful after having failed (coordinating-only nodes pod) | `1`                                                     |
 | `coordinating.readinessProbe.failureThreshold`    | Minimum consecutive failures for the probe to be considered failed after having succeeded                                 | `5`                                                     |
 | `data.name`                                       | Data node pod name                                                                                                        | `data`                                                  |
-| `data.replicas`                                   | Desired number of Elasticsearch data nodes    nodes                                                                       | `3`                                                     |
+| `data.replicas`                                   | Desired number of Elasticsearch data nodes                                                                                | `3`                                                     |
 | `data.updateStrategy.type`                        | Update strategy for Data statefulset                                                                                      | `RollingUpdate`                                         |
 | `data.updateStrategy.rollingUpdatePartition`      | Partition update strategy for Data statefulset                                                                            | `nil`                                                   |
 | `data.heapSize`                                   | Data node heap size                                                                                                       | `1024m`                                                 |
@@ -130,6 +132,7 @@ The following table lists the configurable parameters of the Elasticsearch chart
 | `data.livenessProbe.timeoutSeconds`               | When the probe times out (data nodes pod)                                                                                 | `5`                                                     |
 | `data.livenessProbe.successThreshold`             | Minimum consecutive successes for the probe to be considered successful after having failed (data nodes pod)              | `1`                                                     |
 | `data.livenessProbe.failureThreshold`             | Minimum consecutive failures for the probe to be considered failed after having succeeded                                 | `5`                                                     |
+| `data.podAnnotations`                             | Annotations for data pods. | `{}` |
 | `data.readinessProbe.enabled`                     | Enable/disable the readiness probe (data nodes pod)                                                                       | `true`                                                  |
 | `data.readinessProbe.initialDelaySeconds`         | Delay before readiness probe is initiated (data nodes pod)                                                                | `90`                                                    |
 | `data.readinessProbe.periodSeconds`               | How often to perform the probe (data nodes pod)                                                                           | `10`                                                    |
@@ -154,6 +157,7 @@ The following table lists the configurable parameters of the Elasticsearch chart
 | `ingest.livenessProbe.timeoutSeconds`             | When the probe times out (ingest nodes pod)                                                                               | `5`                                                     |
 | `ingest.livenessProbe.successThreshold`           | Minimum consecutive successes for the probe to be considered successful after having failed (ingest nodes pod)            | `1`                                                     |
 | `ingest.livenessProbe.failureThreshold`           | Minimum consecutive failures for the probe to be considered failed after having succeeded                                 | `5`                                                     |
+| `ingest.podAnnotations`                           | Annotations for ingest pods. | `{}` |
 | `ingest.readinessProbe.enabled`                   | Enable/disable the readiness probe (ingest nodes pod)                                                                     | `true`                                                  |
 | `ingest.readinessProbe.initialDelaySeconds`       | Delay before readiness probe is initiated (ingest nodes pod)                                                              | `90`                                                    |
 | `ingest.readinessProbe.periodSeconds`             | How often to perform the probe (ingest nodes pod)                                                                         | `10`                                                    |
@@ -165,9 +169,10 @@ The following table lists the configurable parameters of the Elasticsearch chart
 | `metrics.image.registry`                          | Metrics exporter image registry                                                                                           | `docker.io`                                             |
 | `metrics.image.repository`                        | Metrics exporter image repository                                                                                         | `bitnami/elasticsearch-exporter`                        |
 | `metrics.image.tag`                               | Metrics exporter image tag                                                                                                | `1.0.2`                                                 |
-| `metrics.image.pullPolicy`                        | Metrics exporter image pull policy                                                                                        | `Always`                                                |
+| `metrics.image.pullPolicy`                        | Metrics exporter image pull policy                                                                                        | `IfNotPresent`                                          |
 | `metrics.service.type`                            | Metrics exporter endpoint service type                                                                                    | `ClusterIP`                                             |
 | `metrics.resources`                               | Metrics exporter resource requests/limit                                                                                  | `requests: { cpu: "25m" }`                              |
+| `metrics.podAnnotations`                          | Annotations for metrics pods. | `{}` |
 | `sysctlImage.enabled`                             | Enable kernel settings modifier image                                                                                     | `false`                                                 |
 | `sysctlImage.registry`                            | Kernel settings modifier image registry                                                                                   | `docker.io`                                             |
 | `sysctlImage.repository`                          | Kernel settings modifier image repository                                                                                 | `bitnami/minideb`                                       |
@@ -190,7 +195,173 @@ Alternatively, a YAML file that specifies the values for the parameters can be p
 $ helm install --name my-release -f values.yaml bitnami/elasticsearch
 ```
 
-> **Tip**: You can use the default [values.yaml](values.yaml). [values-production.yaml](values-production.yaml) has defaults optimized for use in production environments.
+> **Tip**: You can use the default [values.yaml](values.yaml).
+
+### Production configuration
+
+This chart includes a `values-production.yaml` file where you can find some parameters oriented to production configuration in comparison to the regular `values.yaml`.
+
+```console
+$ helm install --name my-release -f ./values-production.yaml bitnami/elasticsearch
+```
+
+- Desired number of Elasticsearch master-eligible nodes:
+```diff
+- master.replicas: 2
++ master.replicas: 3
+```
+
+- Enable the liveness probe (master-eligible nodes pod):
+```diff
+- master.livenessProbe.enabled: false
+-   #  initialDelaySeconds: 90
+-   #  periodSeconds: 10
+-   #  timeoutSeconds: 5
+-   #  successThreshold: 1
+-   #  failureThreshold: 5
++ master.livenessProbe.enabled: true
++   initialDelaySeconds: 90
++   periodSeconds: 10
++   timeoutSeconds: 5
++   successThreshold: 1
++   failureThreshold: 5
+```
+
+- Enable the readiness probe (master-eligible nodes pod):
+```diff
+- master.readinessProbe.enabled: false
+-   #  initialDelaySeconds: 90
+-   #  periodSeconds: 10
+-   #  timeoutSeconds: 5
+-   #  successThreshold: 1
+-   #  failureThreshold: 5
++ master.readinessProbe.enabled: true
++   initialDelaySeconds: 90
++   periodSeconds: 10
++   timeoutSeconds: 5
++   successThreshold: 1
++   failureThreshold: 5
+```
+
+- Enable the liveness probe (coordinating-only nodes pod):
+```diff
+- coordinating.livenessProbe.enabled: false
+-   #  initialDelaySeconds: 90
+-   #  periodSeconds: 10
+-   #  timeoutSeconds: 5
+-   #  successThreshold: 1
+-   #  failureThreshold: 5
++ coordinating.livenessProbe.enabled: true
++   initialDelaySeconds: 90
++   periodSeconds: 10
++   timeoutSeconds: 5
++   successThreshold: 1
++   failureThreshold: 5
+```
+
+- Enable the readiness probe (coordinating-only nodes pod):
+```diff
+- coordinating.readinessProbe.enabled: false
+-   #  initialDelaySeconds: 90
+-   #  periodSeconds: 10
+-   #  timeoutSeconds: 5
+-   #  successThreshold: 1
+-   #  failureThreshold: 5
++ coordinating.readinessProbe.enabled: true
++   initialDelaySeconds: 90
++   periodSeconds: 10
++   timeoutSeconds: 5
++   successThreshold: 1
++   failureThreshold: 5
+```
+
+- Desired number of Elasticsearch data nodes:
+```diff
+- data.replicas: 2
++ data.replicas: 3
+```
+
+- Enable the liveness probe (data nodes pod):
+```diff
+- data.livenessProbe.enabled: false
+-   #  initialDelaySeconds: 90
+-   #  periodSeconds: 10
+-   #  timeoutSeconds: 5
+-   #  successThreshold: 1
+-   #  failureThreshold: 5
++ data.livenessProbe.enabled: true
++   initialDelaySeconds: 90
++   periodSeconds: 10
++   timeoutSeconds: 5
++   successThreshold: 1
++   failureThreshold: 5
+```
+
+- Enable the readiness probe (data nodes pod):
+```diff
+- data.readinessProbe.enabled: false
+-   #  initialDelaySeconds: 90
+-   #  periodSeconds: 10
+-   #  timeoutSeconds: 5
+-   #  successThreshold: 1
+-   #  failureThreshold: 5
++ data.readinessProbe.enabled: true
++   initialDelaySeconds: 90
++   periodSeconds: 10
++   timeoutSeconds: 5
++   successThreshold: 1
++   failureThreshold: 5
+```
+
+- Enable ingest nodes:
+```diff
+- ingest.enabled: false
++ ingest.enabled: true
+```
+
+- Enable the liveness probe (ingest nodes pod):
+```diff
+- ingest.livenessProbe.enabled: false
+-   #  initialDelaySeconds: 90
+-   #  periodSeconds: 10
+-   #  timeoutSeconds: 5
+-   #  successThreshold: 1
+-   #  failureThreshold: 5
++ ingest.livenessProbe.enabled: true
++   initialDelaySeconds: 90
++   periodSeconds: 10
++   timeoutSeconds: 5
++   successThreshold: 1
++   failureThreshold: 5
+```
+
+- Enable the readiness probe (ingest nodes pod):
+```diff
+- ingest.readinessProbe.enabled: false
+-   #  initialDelaySeconds: 90
+-   #  periodSeconds: 10
+-   #  timeoutSeconds: 5
+-   #  successThreshold: 1
+-   #  failureThreshold: 5
++ ingest.readinessProbe.enabled: true
++   initialDelaySeconds: 90
++   periodSeconds: 10
++   timeoutSeconds: 5
++   successThreshold: 1
++   failureThreshold: 5
+```
+
+- Enable prometheus exporter:
+```diff
+- metrics.enabled: false
++ metrics.enabled: true
+```
+
+### [Rolling VS Immutable tags](https://docs.bitnami.com/containers/how-to/understand-rolling-tags-containers/)
+
+It is strongly recommended to use immutable tags in a production environment. This ensures your deployment does not change automatically if the same tag is updated with a different image.
+
+Bitnami will release a new chart updating its containers if a new version of the main container, significant changes, or critical vulnerabilities exist.
 
 ## Persistence
 

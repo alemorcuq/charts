@@ -18,12 +18,12 @@ global:
 image:
   registry: docker.io
   repository: bitnami/minio
-  tag: 2019.5.14
+  tag: 2019.6.4-debian-9-r9
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
   ##
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   ## Optionally specify an array of imagePullSecrets.
   ## Secrets must be manually created in the namespace.
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -42,7 +42,7 @@ image:
 clientImage:
   registry: docker.io
   repository: bitnami/minio-client
-  tag: latest
+  tag: 2019.6.7-debian-9-r2
 
 ## MinIO server mode. Allowed values: standalone or distributed.
 ## Distributed Minio ref: https://docs.minio.io/docs/distributed-minio-quickstart-guide
@@ -71,7 +71,6 @@ statefulset:
 ## Mount MinIO secret as a file instead of passing environment variable
 ##
 useCredentialsFile: false
-
 accessKey:
   ## MinIO Access Key
   ## ref: https://github.com/bitnami/bitnami-docker-minio/#setting-up-minio-in-distributed-mode
@@ -102,7 +101,7 @@ disableWebUI: false
 
 ## Define custom environment variables to pass to the image here
 ##
-extraEnv:
+extraEnv: {}
 
 ## Pod annotations
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/

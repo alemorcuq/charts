@@ -51,15 +51,16 @@ The following table lists the configurable parameters of the MinIO chart and the
 | `global.imagePullSecrets`            | Global Docker registry secret names as an array                                              | `[]` (does not add image pull secrets to deployed pods) |
 | `image.registry`                     | PyTorch image registry                                                                       | `docker.io`                                             |
 | `image.repository`                   | PyTorch image name                                                                           | `bitnami/pytorch`                                       |
-| `image.tag`                          | PyTorch image tag                                                                            | `{VERSION}`                                             |
+| `image.tag`                          | PyTorch image tag                                                                            | `{TAG_NAME}`                                            |
 | `image.pullPolicy`                   | Image pull policy                                                                            | `IfNotPresent`                                          |
 | `image.pullSecrets`                  | Specify docker-registry secret names as an array                                             | `[]` (does not add image pull secrets to deployed pods) |
 | `image.debug`                        | Specify if debug logs should be enabled                                                      | `false`                                                 |
 | `git.registry`                       | Git image registry                                                                           | `docker.io`                                             |
 | `git.repository`                     | Git image name                                                                               | `bitnami/git`                                           |
-| `git.tag`                            | Git image tag                                                                                | `latest`                                                |
-| `git.pullPolicy`                     | Git image pull policy                                                                        | `Always`                                                |
+| `git.tag`                            | Git image tag                                                                                | `{TAG_NAME}`                                              |
+| `git.pullPolicy`                     | Git image pull policy                                                                        | `IfNotPresent`                                          |
 | `git.pullSecrets`                    | Specify docker-registry secret names as an array                                             | `[]` (does not add image pull secrets to deployed pods) |
+| service.type                         | Kubernetes service type                                                                      | `ClusterIP`                                             |
 | `entrypoint.file`                    | Main entrypoint to your application                                                          | `''`                                                    |
 | `entrypoint.args`                    | Args required by your entrypoint                                                             | `nil`                                                   |
 | `mode`                               | Run PyTorch in standalone or distributed mode (possible values: `standalone`, `distributed`) | `standalone`                                            |
@@ -115,12 +116,38 @@ $ helm install --name my-release -f values.yaml bitnami/pytorch
 
 > **Tip**: You can use the default [values.yaml](values.yaml)
 
+### Production configuration
+
+This chart includes a `values-production.yaml` file where you can find some parameters oriented to production configuration in comparison to the regular `values.yaml`.
+
+```console
+$ helm install --name my-release -f ./values-production.yaml bitnami/pytorch
+```
+
+- Run PyTorch in distributed mode:
+```diff
+- mode: standalone
++ mode: distributed
+```
+
+- Number of nodes that will run the code:
+```diff
+- #worldSize:
++ worldSize: 4
+```
+
+### [Rolling VS Immutable tags](https://docs.bitnami.com/containers/how-to/understand-rolling-tags-containers/)
+
+It is strongly recommended to use immutable tags in a production environment. This ensures your deployment does not change automatically if the same tag is updated with a different image.
+
+Bitnami will release a new chart updating its containers if a new version of the main container, significant changes, or critical vulnerabilities exist.
+
 ## Loading your files
 
 The PyTorch chart supports three different ways to load your files. In order of priority, they are:
 
-  1. Existing config map 
-  2. Files under the `files` directory 
+  1. Existing config map
+  2. Files under the `files` directory
   3. Cloning a git repository
 
 This means that if you specify a config map with your files, it won't look for the `files/` directory nor the git repository.
@@ -133,7 +160,7 @@ $ helm install --name my-release \
   bitnami/pytorch
 ```
 
-To load your files from the `files/` directory you don't have to set any option. Just copy your files inside and don't specify a `ConfigMap`: 
+To load your files from the `files/` directory you don't have to set any option. Just copy your files inside and don't specify a `ConfigMap`:
 
 ```console
 $ helm install --name my-release \

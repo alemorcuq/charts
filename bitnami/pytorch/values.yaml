@@ -13,7 +13,7 @@
 image:
   registry: docker.io
   repository: bitnami/pytorch
-  tag: 1.1.0
+  tag: 1.1.0-debian-9-r32
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -37,8 +37,8 @@ image:
 git:
   registry: docker.io
   repository: bitnami/git
-  tag: latest
-  pullPolicy: Always
+  tag: 2.22.0-debian-9-r2
+  pullPolicy: IfNotPresent
   ## Optionally specify an array of imagePullSecrets.
   ## Secrets must be manually created in the namespace.
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -46,11 +46,15 @@ git:
   # pullSecrets:
   #   - myRegistryKeySecretName
 
+service:
+  ## Kubernetes service type, ClusterIP and NodePort are supported at present
+  type: ClusterIP
+
 ## PyTorch configuration
 ##
 ## The main entrypoint of your app, this will be executed as:
 ##   python [file] [args]
-entrypoint: 
+entrypoint:
   file:
   #args:
 
@@ -80,7 +84,7 @@ cloneFilesFromGit:
 #  repository:
 #  revision: master
 
-## Additional environment variables 
+## Additional environment variables
 ##
 # extraEnvVars:
 #   - name: NCCL_DEBUG
