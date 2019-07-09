@@ -110,7 +110,9 @@ Return the proper etcdctl authentication options
 {{- printf "%s" $rbacOption -}}
 {{- end -}}
 {{- if .Values.auth.client.secureTransport -}}
+{{- if not .Values.auth.client.useAutoTLS -}}
 {{- printf "%s" $certsOption -}}
+{{- end -}}
 {{- end -}}
 {{- if .Values.auth.client.enableAuthentication -}}
 {{- printf "%s" $caOption -}}
