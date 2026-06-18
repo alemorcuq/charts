@@ -89,7 +89,7 @@ diagnosticMode:
 ##
 image:
   registry: docker.io
-  repository: bitnami/wordpress
+  repository: bitnamilegacy/wordpress
   tag: 6.8.2-debian-12-r4
   digest: ""
   ## Specify a imagePullPolicy
@@ -558,7 +558,7 @@ lifecycleHooks: {}
 service:
   ## @param service.type WordPress service type
   ##
-  type: LoadBalancer
+  type: ClusterIP
   ## @param service.ports.http WordPress service HTTP port
   ## @param service.ports.https WordPress service HTTPS port
   ##
@@ -1224,6 +1224,8 @@ networkPolicy:
 ## ref: https://github.com/bitnami/charts/blob/main/bitnami/mariadb/values.yaml
 ##
 mariadb:
+  image:
+    repository: bitnamilegacy/mariadb
   ## @param mariadb.enabled Deploy a MariaDB server to satisfy the applications database requirements
   ## To use an external database set this to false and configure the `externalDatabase.*` parameters
   ##
