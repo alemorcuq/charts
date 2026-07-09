@@ -70,7 +70,7 @@ extraDeploy: []
 ##
 image:
   registry: docker.io
-  repository: bitnami/apache
+  repository: bitnamilegacy/apache
   tag: 2.4.65-debian-12-r2
   digest: ""
   ## Specify a imagePullPolicy
@@ -99,7 +99,7 @@ image:
 ##
 git:
   registry: docker.io
-  repository: bitnami/git
+  repository: bitnamilegacy/git
   tag: 2.51.0-debian-12-r0
   digest: ""
   pullPolicy: IfNotPresent
