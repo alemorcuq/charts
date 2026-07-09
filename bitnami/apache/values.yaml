@@ -321,7 +321,7 @@ startupProbe:
   enabled: false
   path: "/"
   port: http
-  initialDelaySeconds: 180
+  initialDelaySeconds: 30
   periodSeconds: 20
   timeoutSeconds: 5
   failureThreshold: 6
@@ -337,7 +337,7 @@ startupProbe:
 livenessProbe:
   enabled: true
   port: http
-  initialDelaySeconds: 180
+  initialDelaySeconds: 30
   periodSeconds: 20
   timeoutSeconds: 5
   failureThreshold: 6
